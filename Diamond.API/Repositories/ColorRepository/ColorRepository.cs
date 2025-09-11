@@ -2,7 +2,7 @@
 using Diamond.Share.Models;
 using Diamond.API.Data;
 
-namespace Diamond.API.Repositories
+namespace Diamond.API.Repositories.ColorRepository
 {
     public class ColorRepository : IColorRepository
     {

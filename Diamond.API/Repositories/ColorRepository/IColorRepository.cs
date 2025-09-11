@@ -1,6 +1,6 @@
 ﻿using Diamond.Share.Models;
 
-namespace Diamond.API.Repositories
+namespace Diamond.API.Repositories.ColorRepository
 {
     public interface IColorRepository
     {

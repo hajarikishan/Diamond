@@ -1,29 +1,29 @@
-﻿@page "/colors"
+﻿@page "/shapes"
 @rendermode InteractiveServer
 
 @using Diamond.Share.Models
 @inject HttpClient Http
 @inject IJSRuntime JS
 
-<h3 class="mb-4">Colors</h3>
+<h3 class="mb-4">Shapes</h3>
 
 <div class="row">
     <!-- Left side: Table -->
     <div class="col-md-8">
         <div class="card shadow-sm mb-4">
             <div class="card-header bg-primary text-white">
-                <strong>Colors List</strong>
+                <strong>Shapes List</strong>
             </div>
             <div class="card-body">
                 <!-- Search -->
                 <div class="input-group mb-3" style="max-width: 450px;">
-                    <input type="text" class="form-control" placeholder="Search colors by name..."
+                    <input type="text" class="form-control" placeholder="Search shapes by name..."
                            @bind="searchTerm" />
                     <button class="btn btn-primary" type="button" @onclick="ApplyFilters">
                         <i class="bi bi-search"></i> Search
                     </button>
                     <button class="btn btn-secondary ms-2" type="button" @onclick="ResetSearch">
-                        <i class="bi bi-x-Circle">Reset</i>
+                        <i class="bi bi-x-circle"></i> Reset
                     </button>
                 </div>
 
@@ -35,21 +35,25 @@
                                 <th>ID</th>
                                 <th>Name</th>
                                 <th>Description</th>
+                                <th>Min Carat</th>
+                                <th>Max Carat</th>
                                 <th style="width:150px;">Actions</th>
                             </tr>
                         </thead>
                         <tbody>
-                            @if (pagedColors.Any())
+                            @if (pagedShapes.Any())
                             {
-                                @foreach (var c in pagedColors)
+                                @foreach (var s in pagedShapes)
                                 {
                                     <tr>
-                                        <td>@c.ColorId</td>
-                                        <td>@c.ColorName</td>
-                                        <td>@c.Description</td>
+                                        <td>@s.ShapeId</td>
+                                        <td>@s.ShapeName</td>
+                                        <td>@s.Description</td>
+                                        <td>@s.MinCarat</td>
+                                        <td>@s.MaxCarat</td>
                                         <td>
-                                            <button class="btn btn-sm btn-warning me-1" @onclick="() => EditColor(c)">Edit</button>
-                                            <button class="btn btn-sm btn-danger" @onclick="() => ConfirmDelete(c.ColorId)">Delete</button>
+                                            <button class="btn btn-sm btn-warning me-1" @onclick="() => EditShape(s)">Edit</button>
+                                            <button class="btn btn-sm btn-danger" @onclick="() => ConfirmDelete(s.ShapeId)">Delete</button>
                                         </td>
                                     </tr>
                                 }
@@ -57,7 +61,7 @@
                             else
                             {
                                 <tr>
-                                    <td colspan="4" class="text-center text-muted">No records found</td>
+                                    <td colspan="6" class="text-center text-muted">No records found</td>
                                 </tr>
                             }
                         </tbody>
@@ -89,27 +93,37 @@
     <div class="col-md-4">
         <div class="card shadow-sm">
             <div class="card-header bg-success text-white">
-                <strong>@(newColor.ColorId == 0 ? "Add New Color" : "Edit Color")</strong>
+                <strong>@(newShape.ShapeId == 0 ? "Add New Shape" : "Edit Shape")</strong>
             </div>
             <div class="card-body">
-                <EditForm Model="newColor" OnValidSubmit="HandleValidSubmit">
+                <EditForm Model="newShape" OnValidSubmit="HandleValidSubmit">
                     <DataAnnotationsValidator />
                     <ValidationSummary />
 
                     <div class="mb-3">
-                        <label class="form-label">Name <span class="text-danger">*</span></label>
-                        <InputText @bind-Value="newColor.ColorName" class="form-control py-2" />
-                        <ValidationMessage For="@(() => newColor.ColorName)" />
+                        <label class="form-label">Shape Name <span class="text-danger">*</span></label>
+                        <InputText @bind-Value="newShape.ShapeName" class="form-control py-2" />
+                        <ValidationMessage For="@(() => newShape.ShapeName)" />
                     </div>
 
                     <div class="mb-3">
                         <label class="form-label">Description</label>
-                        <InputText @bind-Value="newColor.Description" class="form-control py-2" />
+                        <InputText @bind-Value="newShape.Description" class="form-control py-2" />
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label">Min Carat</label>
+                        <InputNumber @bind-Value="newShape.MinCarat" class="form-control py-2" />
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label">Max Carat</label>
+                        <InputNumber @bind-Value="newShape.MaxCarat" class="form-control py-2" />
                     </div>
 
                     <button type="submit" class="btn btn-success me-2 px-3 py-2">Save</button>
                     <button type="button" class="btn btn-secondary px-3 py-2" @onclick="Cancel">
-                        @(newColor.ColorId == 0 ? "Cancel" : "Back")
+                        @(newShape.ShapeId == 0 ? "Cancel" : "Back")
                     </button>
                 </EditForm>
             </div>
@@ -118,12 +132,11 @@
 </div>
 
 @code {
+    private readonly string baseUrl = "http://localhost:5218/api/shapes";
 
-    private readonly string baseUrl = "http://localhost:5218/api/colors";
-
-    private List<MD_COLOR>? colors;
-    private List<MD_COLOR> pagedColors = new();
-    private MD_COLOR newColor = new() { Description = "" };
+    private List<MD_SHAPE>? shapes;
+    private List<MD_SHAPE> pagedShapes = new();
+    private MD_SHAPE newShape = new() { Description = "", MinCarat = 0, MaxCarat = 0 };
     private string searchTerm = "";
 
     // Pagination
@@ -133,31 +146,31 @@
 
     protected override async Task OnInitializedAsync()
     {
-        await LoadColors();
+        await LoadShapes();
     }
 
-    private async Task LoadColors()
+    private async Task LoadShapes()
     {
-        colors = await Http.GetFromJsonAsync<List<MD_COLOR>>(baseUrl);
+        shapes = await Http.GetFromJsonAsync<List<MD_SHAPE>>(baseUrl);
         ApplyFilters();
     }
 
     private void ApplyFilters()
     {
-        if (colors == null) return;
+        if (shapes == null) return;
 
-        var filtered = colors
-            .Where(c => string.IsNullOrEmpty(searchTerm) ||
-                        c.ColorName.Contains(searchTerm, StringComparison.OrdinalIgnoreCase))
+        var filtered = shapes
+            .Where(s => string.IsNullOrEmpty(searchTerm) ||
+                        s.ShapeName.Contains(searchTerm, StringComparison.OrdinalIgnoreCase))
             .ToList();
 
         totalPages = (int)Math.Ceiling(filtered.Count / (double)pageSize);
         if (currentPage > totalPages) currentPage = totalPages == 0 ? 1 : totalPages;
 
-        pagedColors = filtered.Skip((currentPage - 1) * pageSize).Take(pageSize).ToList();
+        pagedShapes = filtered.Skip((currentPage - 1) * pageSize).Take(pageSize).ToList();
     }
 
-    public void ResetSearch()
+    private void ResetSearch()
     {
         searchTerm = "";
         ApplyFilters();
@@ -178,55 +191,57 @@
 
     private async Task HandleValidSubmit()
     {
-        await SaveColor();
+        await SaveShape();
     }
 
-    private async Task SaveColor()
+    private async Task SaveShape()
     {
         HttpResponseMessage response;
 
-        if (string.IsNullOrWhiteSpace(newColor.ColorName))
+        if (string.IsNullOrWhiteSpace(newShape.ShapeName))
             return;
 
-        if (newColor.ColorId == 0)
-            response = await Http.PostAsJsonAsync(baseUrl, newColor);
+        if (newShape.ShapeId == 0)
+            response = await Http.PostAsJsonAsync(baseUrl, newShape);
         else
-            response = await Http.PutAsJsonAsync($"{baseUrl}/{newColor.ColorId}", newColor);
+            response = await Http.PutAsJsonAsync($"{baseUrl}/{newShape.ShapeId}", newShape);
 
         if (response.IsSuccessStatusCode)
         {
-            await LoadColors();
-            newColor = new MD_COLOR() { Description = "" };
+            await LoadShapes();
+            newShape = new MD_SHAPE() { Description = "", MinCarat = 0, MaxCarat = 0 };
         }
     }
 
-    private void EditColor(MD_COLOR color)
+    private void EditShape(MD_SHAPE shape)
     {
-        newColor = new MD_COLOR
+        newShape = new MD_SHAPE
         {
-            ColorId = color.ColorId,
-            ColorName = color.ColorName,
-            Description = color.Description ?? ""
+            ShapeId = shape.ShapeId,
+            ShapeName = shape.ShapeName,
+            Description = shape.Description ?? "",
+            MinCarat = shape.MinCarat,
+            MaxCarat = shape.MaxCarat
         };
     }
 
     private async Task ConfirmDelete(int id)
     {
-        var confirmed = await JS.InvokeAsync<bool>("confirm", "Are you sure you want to delete this color?");
-        if (confirmed) await DeleteColor(id);
+        var confirmed = await JS.InvokeAsync<bool>("confirm", "Are you sure you want to delete this shape?");
+        if (confirmed) await DeleteShape(id);
     }
 
-    private async Task DeleteColor(int id)
+    private async Task DeleteShape(int id)
     {
         var response = await Http.DeleteAsync($"{baseUrl}/{id}");
         if (response.IsSuccessStatusCode)
         {
-            await LoadColors();
+            await LoadShapes();
         }
     }
 
     private void Cancel()
     {
-        newColor = new ();
+        newShape = new MD_SHAPE() { Description = "", MinCarat = 0, MaxCarat = 0 };
     }
 }

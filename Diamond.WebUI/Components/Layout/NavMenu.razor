@@ -1,29 +1,77 @@
-﻿<head>
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css">
-</head>
-
-<div class="top-row ps-3 navbar navbar-dark">
-    <div class="container-fluid">
-        <a class="navbar-brand" href="">Diamond.WebUI</a>
+﻿<nav class="sidebar bg-dark text-white vh-100">
+    <div class="sidebar-header px-3 py-3">
+        <h4 class="fw-bold">Diamond.WebUI</h4>
     </div>
-</div>
 
-<input type="checkbox" title="Navigation menu" class="navbar-toggler" />
-
-<div class="nav-scrollable" onclick="document.querySelector('.navbar-toggler').click()">
-    <nav class="nav flex-column">
-
-        <div class="nav-item px-3">
-            <NavLink class="nav-link" href="">
-                <span class="bi bi-house"></span> Home
+    <ul class="nav flex-column px-2">
+        <!-- Home -->
+        <li class="nav-item mb-2">
+            <NavLink class="nav-link d-flex align-items-center text-white px-3 py-2 rounded"
+                     href=""
+                     Match="NavLinkMatch.All"
+                     activeClass="active-menu">
+                <i class="bi bi-house-door-fill me-2"></i> Home
             </NavLink>
-        </div>
+        </li>
 
-        <div class="nav-item px-3">
-            <NavLink class="nav-link" href="colors">
-                <span class="bi bi-palette"></span> Colors
+        <hr class="sidebar-separator" />
+
+        <!-- Colors -->
+        <li class="nav-item mb-2">
+            <NavLink class="nav-link d-flex align-items-center text-white px-3 py-2 rounded"
+                     href="colors"
+                     activeClass="active-menu">
+                <i class="bi bi-palette-fill me-2"></i> Colors
             </NavLink>
-        </div>
+        </li>
 
-    </nav>
-</div>
+        <!-- Shapes -->
+        <li class="nav-item mb-2">
+            <NavLink class="nav-link d-flex align-items-center text-white px-3 py-2 rounded"
+                     href="shapes"
+                     activeClass="active-menu">
+                <i class="bi bi-square-fill me-2"></i> Shapes
+            </NavLink>
+        </li>
+    </ul>
+</nav>
+
+
+<style>
+    .sidebar-separator {
+        border-top: 1px solid #444;
+        margin: 0.5rem 0;
+    }
+
+    .nav-section {
+        font-size: 0.75rem;
+        font-weight: 600;
+        letter-spacing: 0.5px;
+    }
+
+    .sidebar {
+        min-width: 220px;
+        max-width: 240px;
+    }
+
+    .nav-link {
+        color: #ddd;
+        font-size: 15px;
+        transition: all 0.2s;
+    }
+
+        .nav-link:hover {
+            background-color: #495057;
+            color: #fff;
+        }
+
+    .active-menu {
+        background-color: #0d6efd !important;
+        color: #fff !important;
+        font-weight: 600;
+    }
+
+    .sidebar-header {
+        border-bottom: 1px solid #444;
+    }
+</style>
