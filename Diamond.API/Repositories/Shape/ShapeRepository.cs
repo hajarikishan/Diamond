@@ -31,7 +31,7 @@ namespace Diamond.API.Repositories.Shapes
         {
             var sql = @"INSERT INTO MD_SHAPE (ShapeName, Description, MinCarat, MaxCarat)
                         VALUES (@ShapeName, @Description, @MinCarat, @MaxCarat);
-                        SELECT IDENT_CURRENT('MD_COLOR');";
+                        SELECT IDENT_CURRENT('MD_SHAPE');";
             return await _conn.ExecuteScalarAsync<int>(sql, shape);
         }
 
