@@ -1,0 +1,65 @@
+﻿@page "/profile"
+@using Microsoft.AspNetCore.Authorization
+
+@rendermode InteractiveServer
+
+@attribute [Authorize]
+@inject HttpClient Http
+@inject IJSRuntime JS
+
+<h3>My Profile</h3>
+
+@if (user != null)
+{
+    <div class="row">
+        <div class="col-md-8">
+            <EditForm Model="editModel" OnValidSubmit="SaveProfile">
+                <DataAnnotationsValidator />
+                <InputText @bind-Value="editModel.UserName" class="form-control mb-2" />
+                <InputText @bind-Value="editModel.Email" class="form-control mb-2" />
+                <button class="btn btn-success">Save</button>
+            </EditForm>
+        </div>
+        <div class="col-md-4">
+            <div>
+                @if (!string.IsNullOrEmpty(user.ProfilePicturePath))
+                {
+                    <img src="@user.ProfilePicturePath" style="max-width:150px" />
+                }
+                <InputFile OnChange="UploadAvatar" />
+            </div>
+        </div>
+    </div>
+}
+
+@code {
+    private dynamic? user;
+    private ProfileModel editModel = new();
+    private class ProfileModel { public string UserName { get; set; } = ""; public string Email { get; set; } = ""; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        var resp = await Http.GetFromJsonAsync<dynamic>("http://localhost:5218/api/users/profile");
+        user = resp;
+        if (user != null) { editModel.UserName = user.userName; editModel.Email = user.email; }
+    }
+
+    private async Task SaveProfile()
+    {
+        await Http.PutAsJsonAsync("http://localhost:5218/api/users/profile", new { UserName = editModel.UserName, Email = editModel.Email });
+        // reload
+        await OnInitializedAsync();
+    }
+
+    private async Task UploadAvatar(InputFileChangeEventArgs e)
+    {
+        var file = e.File;
+        var content = new MultipartFormDataContent();
+        var stream = file.OpenReadStream(1024 * 1024 * 5); // 5MB limit
+        content.Add(new StreamContent(stream), "file", file.Name);
+
+        var uid = (int)user.userId;
+        var resp = await Http.PostAsync($"http://localhost:5218/api/users/{uid}/avatar", content);
+        if (resp.IsSuccessStatusCode) await OnInitializedAsync();
+    }
+}
