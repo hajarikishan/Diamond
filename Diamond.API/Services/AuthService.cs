@@ -1,16 +1,15 @@
-﻿using Diamond.API.Repositories.User;
+﻿using System.IdentityModel.Tokens.Jwt;
+using System.Security.Claims;
+using System.Text;
+using Diamond.API.Models;
+using Diamond.API.Repositories;
 using Diamond.Share.Models.Auth;
 using Microsoft.IdentityModel.Tokens;
-using System.IdentityModel.Tokens.Jwt;
-using System.Security.Claims;
-using System.Security.Cryptography;
-using System.Text;
 
 namespace Diamond.API.Services
 {
     public class AuthService
     {
-
         private readonly UserRepository _userRepo;
         private readonly IConfiguration _config;
 
@@ -20,71 +19,63 @@ namespace Diamond.API.Services
             _config = config;
         }
 
-        //Hash password with SHA256
-        private string HashPassword(string password)
+        public async Task<AuthResponse> RegisterAsync(RegisterRequest req)
         {
-            using var sha = SHA256.Create();
-            var bytes = sha.ComputeHash(Encoding.UTF8.GetBytes(password));
-            return Convert.ToBase64String(bytes);
-        }
+            var existing = await _userRepo.GetUserByEmailAsync(req.Email);
+            if (existing != null) throw new Exception("Email already registered");
 
-        public async Task<AuthResponse> RegisterAsync(RegisterRequest request)
-        {
-            var existingUser = await _userRepo.GetByEmailAsync(request.Email);
-            if (existingUser != null)
-                throw new Exception("Email already registered");
+            var (salt, hash) = PasswordHasher.HashPassword(req.Password);
 
-            var hash = HashPassword(request.Password);
-            await _userRepo.RegisterAsync(request, hash);
-
-            return await LoginAsync(new LoginRequest
+            var user = new User
             {
-                Email = request.Email,
-                Password = request.Password
-            });
+                Username = req.Username,
+                Email = req.Email,
+                PasswordSalt = salt,
+                PasswordHash = hash,
+                Role = "User"
+            };
+
+            var id = await _userRepo.CreateUserAsync(user);
+            user.Id = id;
+
+            var token = GenerateJwtToken(user);
+            return new AuthResponse { Token = token, RefreshToken = Guid.NewGuid().ToString(), Username = user.Username, Role = user.Role };
         }
 
-        public async Task<AuthResponse> LoginAsync(LoginRequest request)
+        public async Task<AuthResponse> LoginAsync(LoginRequest req)
         {
-            var storedHash = await _userRepo.GetPasswordHashAsync(request.Email);
-            if (storedHash == null || storedHash != HashPassword(request.Password))
-                throw new Exception("Invalid credentials");
+            var user = await _userRepo.GetUserByEmailAsync(req.Email);
+            if (user == null) throw new Exception("Invalid credentials");
 
-            var user = await _userRepo.GetByEmailAsync(request.Email);
-            return GenerateToken(user);
+            var ok = PasswordHasher.VerifyPassword(req.Password, user.PasswordSalt, user.PasswordHash);
+            if (!ok) throw new Exception("Invalid credentials");
+
+            var token = GenerateJwtToken(user);
+            return new AuthResponse { Token = token, RefreshToken = Guid.NewGuid().ToString(), Username = user.Username, Role = user.Role };
         }
 
-        public AuthResponse GenerateToken(UserProfileDto user)
+        private string GenerateJwtToken(User user)
         {
-            var jwtKey = _config["Jwt:Key"];
-            var jwtIssuer = _config["Jwt:Issuer"];
-            var jwtAudience = _config["Jwt:Audience"];
+            var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_config["Jwt:Key"]));
+            var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
 
             var claims = new[]
             {
-                new Claim(ClaimTypes.Name, user.Username),
+                new Claim(JwtRegisteredClaimNames.Sub, user.Id.ToString()),
+                new Claim(JwtRegisteredClaimNames.UniqueName, user.Username),
                 new Claim(ClaimTypes.Email, user.Email),
-                new Claim(ClaimTypes.Role, user.Role ?? "User")
+                new Claim(ClaimTypes.Role, user.Role)
             };
 
-            var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtKey));
-            var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
-
             var token = new JwtSecurityToken(
-                issuer: jwtIssuer,
-                audience: jwtAudience,
+                issuer: _config["Jwt:Issuer"],
+                audience: _config["Jwt:Audience"],
                 claims: claims,
-                expires: DateTime.Now.AddHours(2),
+                expires: DateTime.UtcNow.AddMinutes(double.Parse(_config["Jwt:ExpireMinutes"] ?? "60")),
                 signingCredentials: creds
             );
 
-            return new AuthResponse
-            {
-                Token = new JwtSecurityTokenHandler().WriteToken(token),
-                RefreshToken = Guid.NewGuid().ToString(), //later store in DB
-                Role = user.Role,
-                Username = user.Username
-            };
+            return new JwtSecurityTokenHandler().WriteToken(token);
         }
     }
 }

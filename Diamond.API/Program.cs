@@ -7,7 +7,7 @@ using Diamond.API.Repositories.Polish;
 using Diamond.API.Repositories.Purity;
 using Diamond.API.Repositories.ShapeRepository;
 using Diamond.API.Repositories.Shapes;
-using Diamond.API.Repositories.User;
+using Diamond.API.Repositories;
 using Diamond.API.Services;
 using Diamond.API.Services.Clarity;
 using Diamond.API.Services.Colors;
@@ -54,7 +54,8 @@ builder.Services.AddScoped<IPolishService, PolishService>();
 builder.Services.AddScoped<IDashboardService, DashboardService>();
 builder.Services.AddScoped<AuthService>();
 
-// 🔐 JWT Authentication
+// JWT auth
+var key = Encoding.UTF8.GetBytes(builder.Configuration["Jwt:Key"]);
 builder.Services.AddAuthentication(options =>
 {
     options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
@@ -62,6 +63,8 @@ builder.Services.AddAuthentication(options =>
 })
 .AddJwtBearer(options =>
 {
+    options.RequireHttpsMetadata = false; // set true in prod
+    options.SaveToken = true;
     options.TokenValidationParameters = new TokenValidationParameters
     {
         ValidateIssuer = true,
@@ -70,8 +73,7 @@ builder.Services.AddAuthentication(options =>
         ValidateIssuerSigningKey = true,
         ValidIssuer = builder.Configuration["Jwt:Issuer"],
         ValidAudience = builder.Configuration["Jwt:Audience"],
-        IssuerSigningKey = new SymmetricSecurityKey(
-            Encoding.UTF8.GetBytes(builder.Configuration["Jwt:Key"]))
+        IssuerSigningKey = new SymmetricSecurityKey(key)
     };
 });
 
@@ -89,6 +91,7 @@ app.UseHttpsRedirection();
 
 app.UseRouting();
 
+app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapControllers();

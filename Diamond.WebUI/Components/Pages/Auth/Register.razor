@@ -2,63 +2,37 @@
 
 @rendermode InteractiveServer
 
-@using Diamond.Share.Models.Auth
 @using Diamond.WebUI.Services
 @using Microsoft.AspNetCore.Components.Authorization
-@inject AuthService AuthService
-@inject NavigationManager Nav
-@inject IJSRuntime JS
+@inject Diamond.WebUI.Services.AuthService AuthService
 @inject AuthenticationStateProvider AuthStateProvider
+@inject NavigationManager Nav
 
-<h3 class="mb-3">Register</h3>
+<h3>Register</h3>
 
-@if (!string.IsNullOrEmpty(errorMessage))
-{
-    <div class="alert alert-danger">@errorMessage</div>
-}
-
-<EditForm Model="registerModel" OnValidSubmit="HandleRegister">
+<EditForm Model="model" OnValidSubmit="Handle">
     <DataAnnotationsValidator />
     <ValidationSummary />
-
-    <div class="mb-3">
-        <label>Username</label>
-        <InputText @bind-Value="registerModel.Username" class="form-control" />
-    </div>
-
-    <div class="mb-3">
-        <label>Email</label>
-        <InputText @bind-Value="registerModel.Email" class="form-control" />
-    </div>
-
-    <div class="mb-3">
-        <label>Password</label>
-        <InputText @bind-Value="registerModel.Password" type="password" class="form-control" />
-    </div>
-
-    <button type="submit" class="btn btn-success">Register</button>
+    <InputText @bind-Value="model.Username" placeholder="Username" class="form-control mb-2" />
+    <InputText @bind-Value="model.Email" placeholder="Email" class="form-control mb-2" />
+    <InputText @bind-Value="model.Password" placeholder="Password" type="password" class="form-control mb-2" />
+    <button class="btn btn-success">Register</button>
 </EditForm>
 
 @code {
-    private RegisterRequest registerModel = new();
-    private string errorMessage;
-
-    private async Task HandleRegister()
+    private Diamond.Share.Models.Auth.RegisterRequest model = new();
+    private string error;
+    private async Task Handle()
     {
         try
         {
-            var result = await AuthService.Register(registerModel);
-
-            // Save token
-            await JS.InvokeVoidAsync("localStorage.setItem", "authToken", result.Token);
-            ((CustomAuthStateProvider)AuthStateProvider).NotifyUserAuthentication(result.Token);
-
-            // Redirect to login or dashboard
+            var res = await AuthService.Register(model);
+            ((CustomAuthStateProvider)AuthStateProvider).NotifyUserAuthentication(res.Token);
             Nav.NavigateTo("/");
         }
         catch (Exception ex)
         {
-            errorMessage = "Registration failed: " + ex.Message;
+            error = ex.Message;
         }
     }
 }

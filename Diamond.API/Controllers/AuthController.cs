@@ -1,41 +1,39 @@
-﻿using Diamond.API.Services;
-using Diamond.Share.Models.Auth;
+﻿using Diamond.Share.Models.Auth;
+using Diamond.API.Services;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Diamond.API.Controllers
 {
-
     [ApiController]
     [Route("api/[controller]")]
     public class AuthController : ControllerBase
     {
-        private readonly AuthService _authService;
-
-        public AuthController(AuthService authService) => _authService = authService;
+        private readonly AuthService _auth;
+        public AuthController(AuthService auth) => _auth = auth;
 
         [HttpPost("register")]
-        public async Task<IActionResult> Register(RegisterRequest request)
+        public async Task<IActionResult> Register(RegisterRequest req)
         {
             try
             {
-                var result = await _authService.RegisterAsync(request);
-                return Ok(result);
+                var res = await _auth.RegisterAsync(req);
+                return Ok(res);
             }
-            catch (System.Exception ex)
+            catch (Exception ex)
             {
                 return BadRequest(new { message = ex.Message });
             }
         }
 
         [HttpPost("login")]
-        public async Task<IActionResult> Login(LoginRequest request)
+        public async Task<IActionResult> Login(LoginRequest req)
         {
             try
             {
-                var result = await _authService.LoginAsync(request);
-                return Ok(result);
+                var res = await _auth.LoginAsync(req);
+                return Ok(res);
             }
-            catch(System.Exception ex)
+            catch (Exception ex)
             {
                 return Unauthorized(new { message = ex.Message });
             }
