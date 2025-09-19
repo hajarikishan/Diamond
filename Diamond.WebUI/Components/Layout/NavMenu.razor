@@ -1,16 +1,18 @@
-﻿<nav class="sidebar bg-dark text-white vh-100">
+﻿@using Microsoft.AspNetCore.Components.Authorization
+
+<nav class="sidebar bg-dark text-white vh-100">
     <div class="sidebar-header px-3 py-3">
         <h4 class="fw-bold">Diamond.WebUI</h4>
     </div>
 
     <ul class="nav flex-column px-2">
-        <!-- Home -->
+        <!-- Dashboard -->
         <li class="nav-item mb-2">
             <NavLink class="nav-link d-flex align-items-center text-white px-3 py-2 rounded"
-                     href=""
+                     href="/"
                      Match="NavLinkMatch.All"
                      activeClass="active-menu">
-                <i class="bi bi-house-door-fill me-2"></i> Home
+                <i class="bi bi-house-door-fill me-2"></i> Dashboard
             </NavLink>
         </li>
 
@@ -69,9 +71,46 @@
                 <i class="bi bi-square-fill me-2"></i> Polish
             </NavLink>
         </li>
+
+        <hr class="sidebar-separator" />
+
+        <!-- Auth Links -->
+        <AuthorizeView>
+            <Authorized>
+                <li class="nav-item mb-2">
+                    <NavLink class="nav-link text-white px-3 py-2 rounded"
+                             href="profile"
+                             activeClass="active-menu">
+                        <i class="bi bi-person-circle me-2"></i> Profile
+                    </NavLink>
+                </li>
+                <li class="nav-item mb-2">
+                    <NavLink class="nav-link text-white px-3 py-2 rounded"
+                             href="logout"
+                             activeClass="active-menu">
+                        <i class="bi bi-box-arrow-right me-2"></i> Logout
+                    </NavLink>
+                </li>
+            </Authorized>
+            <NotAuthorized>
+                <li class="nav-item mb-2">
+                    <NavLink class="nav-link text-white px-3 py-2 rounded"
+                             href="login"
+                             activeClass="active-menu">
+                        <i class="bi bi-box-arrow-in-right me-2"></i> Login
+                    </NavLink>
+                </li>
+                <li class="nav-item mb-2">
+                    <NavLink class="nav-link text-white px-3 py-2 rounded"
+                             href="register"
+                             activeClass="active-menu">
+                        <i class="bi bi-person-plus-fill me-2"></i> Register
+                    </NavLink>
+                </li>
+            </NotAuthorized>
+        </AuthorizeView>
     </ul>
 </nav>
-
 
 <style>
     .sidebar-separator {

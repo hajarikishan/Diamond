@@ -1,0 +1,20 @@
+﻿@page "/logout"
+
+@rendermode InteractiveServer
+
+@using Diamond.WebUI.Services
+@using Microsoft.AspNetCore.Components.Authorization
+@inject IJSRuntime JS
+@inject AuthenticationStateProvider AuthStateProvider
+@inject NavigationManager Nav
+
+<h3>Logging out...</h3>
+
+@code {
+    protected override async Task OnInitializedAsync()
+    {
+        await JS.InvokeVoidAsync("localStorage.removeItem", "authToken");
+        ((CustomAuthStateProvider)AuthStateProvider).NotifyUserLogout();
+        Nav.NavigateTo("/login");
+    }
+}

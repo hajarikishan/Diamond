@@ -1,7 +1,8 @@
-using Diamond.WebUI.Components;
+﻿using Diamond.WebUI.Components;
+using Diamond.WebUI.Services;
+using Microsoft.AspNetCore.Components.Authorization;
 
 var builder = WebApplication.CreateBuilder(args);
-
 
 // Add services to the container.
 builder.Services.AddRazorComponents()
@@ -9,6 +10,13 @@ builder.Services.AddRazorComponents()
 
 builder.Services.AddHttpClient();
 
+// Auth services
+builder.Services.AddScoped<AuthService>();
+builder.Services.AddScoped<AuthenticationStateProvider, CustomAuthStateProvider>();
+
+// Blazor auth primitives (for <AuthorizeView> + [Authorize] in Razor components)
+builder.Services.AddAuthorizationCore();
+builder.Services.AddAuthenticationCore();
 
 var app = builder.Build();
 
@@ -16,13 +24,10 @@ var app = builder.Build();
 if (!app.Environment.IsDevelopment())
 {
     app.UseExceptionHandler("/Error", createScopeForErrors: true);
-    // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
     app.UseHsts();
 }
 
 app.UseStaticFiles();
-
-
 app.UseAntiforgery();
 
 app.MapStaticAssets();
