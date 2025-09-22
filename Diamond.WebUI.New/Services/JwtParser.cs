@@ -1,7 +1,7 @@
 ﻿using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 
-namespace Diamond.WebUI.Helpers
+namespace Diamond.WebUI.New.Services
 {
     public static class JwtParser
     {

@@ -1,27 +1,32 @@
-﻿using Dapper;
-using Diamond.API.Data;
-using Diamond.Share.Models;
+﻿using System.Data;
+using Dapper;
+using Diamond.Share.Models.Dashboard;
 
 namespace Diamond.API.Repositories.Dashboard
 {
-    public class DashboardRepository : IDashboardRepository
+    public class DashboardRepository
     {
+        private readonly IDbConnection _db;
 
-        private readonly DapperContext _context;
-
-        public DashboardRepository(DapperContext context) => _context = context;
-
-        public async Task<DashboardSummary> GetDashboardAsync()
+        public DashboardRepository(IDbConnection db)
         {
-            var sql = @"SELECT  ColorsCount, ShapesCount, ClarityCount, CutCount, 
-                                PurityCount, PolishCount, LastUpdated
-                        FROM dbo.vw_DashboardCounts;";
-
-            using var connection = _context.CreateConnection();
-            var result = await connection.QueryFirstOrDefaultAsync<DashboardSummary>(sql);
-            return result ?? new DashboardSummary { LastUpdated = DateTime.UtcNow };
+            _db = db;
         }
 
+        public async Task<DashboardSummary> GetSummaryAsync()
+        {
+            var summary = new DashboardSummary
+            {
+                ColorsCount = await _db.ExecuteScalarAsync<int>("SELECT COUNT(*) FROM MD_COLOR"),
+                ShapesCount = await _db.ExecuteScalarAsync<int>("SELECT COUNT(*) FROM MD_SHAPE"),
+                ClarityCount = await _db.ExecuteScalarAsync<int>("SELECT COUNT(*) FROM MD_CLARITY"),
+                CutCount = await _db.ExecuteScalarAsync<int>("SELECT COUNT(*) FROM MD_CUT"),
+                PurityCount = await _db.ExecuteScalarAsync<int>("SELECT COUNT(*) FROM MD_PURITY"),
+                PolishCount = await _db.ExecuteScalarAsync<int>("SELECT COUNT(*) FROM MD_POLISH"),
+                LastUpdated = DateTime.UtcNow
+            };
 
+            return summary;
+        }
     }
 }

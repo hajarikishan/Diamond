@@ -1,26 +1,32 @@
 ﻿@page "/login"
+@using Diamond.WebUI.New.Services
+@using Microsoft.AspNetCore.Components.Authorization
 
 @rendermode InteractiveServer
 
-@using Diamond.WebUI.Services
-@using Microsoft.AspNetCore.Components.Authorization
-@inject Diamond.WebUI.Services.AuthService AuthService
+@inject Diamond.WebUI.New.Services.AuthService AuthService
 @inject AuthenticationStateProvider AuthStateProvider
 @inject NavigationManager Nav
 
 <h3>Login</h3>
 
+@if (!string.IsNullOrEmpty(error))
+{
+    <div class="alert alert-danger">@error</div>
+}
+
 <EditForm Model="model" OnValidSubmit="Handle">
     <DataAnnotationsValidator />
     <ValidationSummary />
     <InputText @bind-Value="model.Email" placeholder="Email" class="form-control mb-2" />
-    <InputText @bind-Value="model.Password" placeholder="Password" type="password" class="form-control mb-2" />
+    <InputText @bind-Value="model.Password" type="password" placeholder="Password" class="form-control mb-2" />
     <button class="btn btn-primary">Login</button>
 </EditForm>
 
 @code {
     private Diamond.Share.Models.Auth.LoginRequest model = new();
     private string error;
+
     private async Task Handle()
     {
         try
@@ -31,7 +37,7 @@
         }
         catch (Exception ex)
         {
-            error = ex.Message;
+            error = "Login failed: " + ex.Message;
         }
     }
 }

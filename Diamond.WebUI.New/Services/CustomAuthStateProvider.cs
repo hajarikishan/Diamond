@@ -1,14 +1,17 @@
 ﻿using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.JSInterop;
-using Diamond.WebUI.Helpers;
 using System.Security.Claims;
 
-namespace Diamond.WebUI.Services
+namespace Diamond.WebUI.New.Services
 {
     public class CustomAuthStateProvider : AuthenticationStateProvider
     {
         private readonly IJSRuntime _js;
-        public CustomAuthStateProvider(IJSRuntime js) => _js = js;
+
+        public CustomAuthStateProvider(IJSRuntime js)
+        {
+            _js = js;
+        }
 
         public override async Task<AuthenticationState> GetAuthenticationStateAsync()
         {

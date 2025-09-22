@@ -2,13 +2,11 @@
 
 @rendermode InteractiveServer
 
-
-@using Diamond.WebUI.Services
+@using Diamond.WebUI.New.Services
 @using Microsoft.AspNetCore.Components.Authorization
-@inject IJSRuntime JS
+@inject Diamond.WebUI.New.Services.AuthService AuthService
 @inject AuthenticationStateProvider AuthStateProvider
 @inject NavigationManager Nav
-@inject Diamond.WebUI.Services.AuthService AuthService
 
 <h3>Logging out...</h3>
 
@@ -17,6 +15,6 @@
     {
         await AuthService.RemoveToken();
         ((CustomAuthStateProvider)AuthStateProvider).NotifyUserLogout();
-        Nav.NavigateTo("/login", true);
+        Nav.NavigateTo("/login", forceLoad: true);
     }
 }

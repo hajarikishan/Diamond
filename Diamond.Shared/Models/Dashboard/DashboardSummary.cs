@@ -1,4 +1,4 @@
-﻿namespace Diamond.Share.Models
+﻿namespace Diamond.Share.Models.Dashboard
 {
     public class DashboardSummary
     {

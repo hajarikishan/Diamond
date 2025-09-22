@@ -1,8 +1,9 @@
-﻿using System.Net.Http.Headers;
-using Diamond.Share.Models.Auth;
+﻿using Diamond.Share.Models.Auth;
 using Microsoft.JSInterop;
+using System.Net.Http.Headers;
+using RegisterRequest = Diamond.Share.Models.Auth.RegisterRequest;
 
-namespace Diamond.WebUI.Services
+namespace Diamond.WebUI.New.Services
 {
     public class AuthService
     {
@@ -25,7 +26,7 @@ namespace Diamond.WebUI.Services
             return auth;
         }
 
-        public async Task<AuthResponse> Login(LoginRequest req)
+        public async Task<AuthResponse> Login(Share.Models.Auth.LoginRequest req)
         {
             var res = await _http.PostAsJsonAsync("api/auth/login", req);
             res.EnsureSuccessStatusCode();
@@ -35,15 +36,7 @@ namespace Diamond.WebUI.Services
             return auth;
         }
 
-        public async Task SaveToken(string token)
-        {
-            await _js.InvokeVoidAsync("localStorage.setItem", "authToken", token);
-        }
-
-        public async Task RemoveToken()
-        {
-            await _js.InvokeVoidAsync("localStorage.removeItem", "authToken");
-            _http.DefaultRequestHeaders.Authorization = null;
-        }
+        public async Task SaveToken(string token) => await _js.InvokeVoidAsync("localStorage.setItem", "authToken", token);
+        public async Task RemoveToken() => await _js.InvokeVoidAsync("localStorage.removeItem", "authToken");
     }
 }

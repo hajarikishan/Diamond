@@ -12,7 +12,6 @@ using Diamond.API.Services;
 using Diamond.API.Services.Clarity;
 using Diamond.API.Services.Colors;
 using Diamond.API.Services.Cut;
-using Diamond.API.Services.Dashboard;
 using Diamond.API.Services.Polish;
 using Diamond.API.Services.Purity;
 using Diamond.API.Services.Shapes;
@@ -41,7 +40,7 @@ builder.Services.AddScoped<IClarityRepository, ClarityRepository>();
 builder.Services.AddScoped<ICutRepository, CutRepository>();
 builder.Services.AddScoped<IPurityRepository, PurityRepository>();
 builder.Services.AddScoped<IPolishRepository, PolishRepository>();
-builder.Services.AddScoped<IDashboardRepository, DashboardRepository>();
+builder.Services.AddScoped<DashboardRepository>();
 builder.Services.AddScoped<UserRepository>();
 
 // Services
@@ -51,7 +50,6 @@ builder.Services.AddScoped<IClarityService, ClarityService>();
 builder.Services.AddScoped<ICutService, CutService>();
 builder.Services.AddScoped<IPurityService, PurityService>();
 builder.Services.AddScoped<IPolishService, PolishService>();
-builder.Services.AddScoped<IDashboardService, DashboardService>();
 builder.Services.AddScoped<AuthService>();
 
 // JWT auth
