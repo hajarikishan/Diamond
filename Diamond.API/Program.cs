@@ -2,7 +2,6 @@
 using Diamond.API.Repositories.Clarity;
 using Diamond.API.Repositories.ColorRepository;
 using Diamond.API.Repositories.Cut;
-using Diamond.API.Repositories.Dashboard;
 using Diamond.API.Repositories.Polish;
 using Diamond.API.Repositories.Purity;
 using Diamond.API.Repositories.ShapeRepository;
@@ -40,7 +39,6 @@ builder.Services.AddScoped<IClarityRepository, ClarityRepository>();
 builder.Services.AddScoped<ICutRepository, CutRepository>();
 builder.Services.AddScoped<IPurityRepository, PurityRepository>();
 builder.Services.AddScoped<IPolishRepository, PolishRepository>();
-builder.Services.AddScoped<DashboardRepository>();
 builder.Services.AddScoped<UserRepository>();
 
 // Services
@@ -50,32 +48,32 @@ builder.Services.AddScoped<IClarityService, ClarityService>();
 builder.Services.AddScoped<ICutService, CutService>();
 builder.Services.AddScoped<IPurityService, PurityService>();
 builder.Services.AddScoped<IPolishService, PolishService>();
-builder.Services.AddScoped<AuthService>();
+//builder.Services.AddScoped<AuthService>();
 
 // JWT auth
-var key = Encoding.UTF8.GetBytes(builder.Configuration["Jwt:Key"]);
-builder.Services.AddAuthentication(options =>
-{
-    options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
-    options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
-})
-.AddJwtBearer(options =>
-{
-    options.RequireHttpsMetadata = false; // set true in prod
-    options.SaveToken = true;
-    options.TokenValidationParameters = new TokenValidationParameters
-    {
-        ValidateIssuer = true,
-        ValidateAudience = true,
-        ValidateLifetime = true,
-        ValidateIssuerSigningKey = true,
-        ValidIssuer = builder.Configuration["Jwt:Issuer"],
-        ValidAudience = builder.Configuration["Jwt:Audience"],
-        IssuerSigningKey = new SymmetricSecurityKey(key)
-    };
-});
+//var key = Encoding.UTF8.GetBytes(builder.Configuration["Jwt:Key"]);
+//builder.Services.AddAuthentication(options =>
+//{
+//    options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+//    options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+//})
+//.AddJwtBearer(options =>
+//{
+//    options.RequireHttpsMetadata = false; // set true in prod
+//    options.SaveToken = true;
+//    options.TokenValidationParameters = new TokenValidationParameters
+//    {
+//        ValidateIssuer = true,
+//        ValidateAudience = true,
+//        ValidateLifetime = true,
+//        ValidateIssuerSigningKey = true,
+//        ValidIssuer = builder.Configuration["Jwt:Issuer"],
+//        ValidAudience = builder.Configuration["Jwt:Audience"],
+//        IssuerSigningKey = new SymmetricSecurityKey(key)
+//    };
+//});
 
-builder.Services.AddAuthorization();
+//builder.Services.AddAuthorization();
 
 var app = builder.Build();
 
@@ -85,7 +83,7 @@ if (app.Environment.IsDevelopment())
     app.MapOpenApi();
 }
 
-//app.UseHttpsRedirection();
+app.UseHttpsRedirection();
 
 app.UseRouting();
 

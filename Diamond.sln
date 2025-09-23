@@ -7,7 +7,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Diamond.API", "Diamond.API\
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Diamond.Share", "Diamond.Shared\Diamond.Share.csproj", "{B0E3F55C-E4F7-48FC-9C80-AAD72D68D95A}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Diamond.WebUI.New", "Diamond.WebUI.New\Diamond.WebUI.New.csproj", "{9F2A1E61-4BF9-40ED-82FF-F60154DC2F25}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Diamond.WebUI", "Diamond.WebUI\Diamond.WebUI.csproj", "{7AF9F8A4-1F71-0B30-8B7E-62BCA347CF42}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -23,10 +23,10 @@ Global
 		{B0E3F55C-E4F7-48FC-9C80-AAD72D68D95A}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{B0E3F55C-E4F7-48FC-9C80-AAD72D68D95A}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{B0E3F55C-E4F7-48FC-9C80-AAD72D68D95A}.Release|Any CPU.Build.0 = Release|Any CPU
-		{9F2A1E61-4BF9-40ED-82FF-F60154DC2F25}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{9F2A1E61-4BF9-40ED-82FF-F60154DC2F25}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{9F2A1E61-4BF9-40ED-82FF-F60154DC2F25}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{9F2A1E61-4BF9-40ED-82FF-F60154DC2F25}.Release|Any CPU.Build.0 = Release|Any CPU
+		{7AF9F8A4-1F71-0B30-8B7E-62BCA347CF42}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{7AF9F8A4-1F71-0B30-8B7E-62BCA347CF42}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{7AF9F8A4-1F71-0B30-8B7E-62BCA347CF42}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{7AF9F8A4-1F71-0B30-8B7E-62BCA347CF42}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
