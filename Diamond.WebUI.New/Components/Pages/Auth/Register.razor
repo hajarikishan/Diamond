@@ -1,27 +1,48 @@
 ﻿@page "/register"
+@rendermode InteractiveServer
+
 @using Diamond.Share.Models.Auth
 @using Diamond.WebUI.New.Services
 @using Microsoft.AspNetCore.Components.Authorization
 
-@rendermode InteractiveServer
-
-@inject Diamond.WebUI.New.Services.AuthService AuthService
+@inject AuthService AuthService
 @inject AuthenticationStateProvider AuthStateProvider
 @inject NavigationManager Nav
 
-<h3>Register</h3>
-<EditForm Model="model" OnValidSubmit="Handle">
-    <DataAnnotationsValidator />
-    <ValidationSummary />
-    <InputText @bind-Value="model.Username" placeholder="Username" class="form-control mb-2" />
-    <InputText @bind-Value="model.Email" placeholder="Email" class="form-control mb-2" />
-    <InputText @bind-Value="model.Password" type="password" placeholder="Password" class="form-control mb-2" />
-    <button class="btn btn-success">Register</button>
-</EditForm>
+<div class="row justify-content-center mt-5">
+    <div class="col-12 col-md-6 col-lg-4">
+        <div class="card shadow-sm p-4">
+            <h3 class="mb-4 text-center fw-bold">Register</h3>
+
+            @if (!string.IsNullOrEmpty(error))
+            {
+                <div class="alert alert-danger">@error</div>
+            }
+
+            <EditForm Model="model" OnValidSubmit="Handle">
+                <DataAnnotationsValidator />
+                <ValidationSummary />
+
+                <div class="mb-3">
+                    <InputText @bind-Value="model.Username" placeholder="Username" class="form-control" />
+                </div>
+                <div class="mb-3">
+                    <InputText @bind-Value="model.Email" placeholder="Email" class="form-control" />
+                </div>
+                <div class="mb-3">
+                    <InputText @bind-Value="model.Password" type="password" placeholder="Password" class="form-control" />
+                </div>
+
+                <button type="button" class="btn btn-success w-100" @onclick="Handle">Register</button>
+            </EditForm>
+        </div>
+    </div>
+</div>
 
 @code {
     private RegisterRequest model = new();
     private string error;
+
     private async Task Handle()
     {
         try
@@ -30,6 +51,9 @@
             ((CustomAuthStateProvider)AuthStateProvider).NotifyUserAuthentication(res.Token);
             Nav.NavigateTo("/");
         }
-        catch (Exception ex) { error = ex.Message; }
+        catch (Exception ex)
+        {
+            error = "Registration failed: " + ex.Message;
+        }
     }
 }

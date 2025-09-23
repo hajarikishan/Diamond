@@ -15,7 +15,7 @@ namespace Diamond.WebUI.New.Services
 
         public override async Task<AuthenticationState> GetAuthenticationStateAsync()
         {
-            var token = await _js.InvokeAsync<string>("localStorage.getItem", "authToken");
+            var token = "";// await _js.InvokeAsync<string>("localStorage.getItem", "authToken");
             var user = JwtParser.ParseClaimsFromJwt(token);
             return new AuthenticationState(user);
         }

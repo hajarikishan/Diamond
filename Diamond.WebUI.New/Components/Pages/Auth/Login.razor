@@ -1,27 +1,38 @@
 ﻿@page "/login"
+@rendermode InteractiveServer
 @using Diamond.WebUI.New.Services
 @using Microsoft.AspNetCore.Components.Authorization
 
-@rendermode InteractiveServer
-
-@inject Diamond.WebUI.New.Services.AuthService AuthService
+@inject AuthService AuthService
 @inject AuthenticationStateProvider AuthStateProvider
 @inject NavigationManager Nav
 
-<h3>Login</h3>
+<div class="row justify-content-center mt-5">
+    <div class="col-12 col-md-6 col-lg-4">
+        <div class="card shadow-sm p-4">
+            <h3 class="mb-4 text-center fw-bold">Login</h3>
 
-@if (!string.IsNullOrEmpty(error))
-{
-    <div class="alert alert-danger">@error</div>
-}
+            @if (!string.IsNullOrEmpty(error))
+            {
+                <div class="alert alert-danger">@error</div>
+            }
 
-<EditForm Model="model" OnValidSubmit="Handle">
-    <DataAnnotationsValidator />
-    <ValidationSummary />
-    <InputText @bind-Value="model.Email" placeholder="Email" class="form-control mb-2" />
-    <InputText @bind-Value="model.Password" type="password" placeholder="Password" class="form-control mb-2" />
-    <button class="btn btn-primary">Login</button>
-</EditForm>
+            <EditForm Model="model" OnValidSubmit="Handle">
+                <DataAnnotationsValidator />
+                <ValidationSummary />
+
+                <div class="mb-3">
+                    <InputText @bind-Value="model.Email" placeholder="Email" class="form-control" />
+                </div>
+                <div class="mb-3">
+                    <InputText @bind-Value="model.Password" type="password" placeholder="Password" class="form-control" />
+                </div>
+
+                <button type="button" class="btn btn-primary w-100" @onclick="Handle">Login</button>
+            </EditForm>
+        </div>
+    </div>
+</div>
 
 @code {
     private Diamond.Share.Models.Auth.LoginRequest model = new();

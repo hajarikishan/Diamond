@@ -1,4 +1,5 @@
 ﻿@using Diamond.WebUI.New.Components.Layout
+@using Diamond.WebUI.New.Services
 @using Microsoft.AspNetCore.Components.Authorization
 
 <CascadingAuthenticationState>
@@ -15,3 +16,23 @@
         </NotFound>
     </Router>
 </CascadingAuthenticationState>
+
+@code {
+
+    [Inject] IJSRuntime JS { get; set; }
+    [Inject] AuthenticationStateProvider AuthStateProvider { get; set; }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            var token = await JS.InvokeAsync<string>("localStorage.getItem", "authToken");
+            if (!string.IsNullOrEmpty(token))
+            {
+                ((CustomAuthStateProvider)AuthStateProvider).NotifyUserAuthentication(token);
+            }
+        }
+
+    }
+
+}
