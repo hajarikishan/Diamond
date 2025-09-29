@@ -1,0 +1,62 @@
+﻿@page "/login"
+
+@rendermode InteractiveServer
+
+@inject UserState UserState
+@inject HttpClient Http
+@inject NavigationManager NavigationManager
+@using Diamond.Share.Models
+@using System.Net.Http.Json
+@using Diamond.WebUI.Services
+
+<h3>Login</h3>
+
+<EditForm Model="loginModel" OnValidSubmit="HandleLogin" FormName="LoginForm">
+    <InputText @bind-Value="loginModel.UserName" placeholder="Username" class="form-control" />
+    <InputText @bind-Value="loginModel.Password" type="password" placeholder="Password" class="form-control mt-2" />
+    <button type="submit" class="btn btn-primary mt-3">Login</button>
+</EditForm>
+
+@if (!string.IsNullOrEmpty(errorMessage))
+{
+    <div class="alert alert-danger mt-2">@errorMessage</div>
+}
+
+@code {
+    private string baseUrl = "http://localhost:5218/api/user/login";
+    private UserLoginRequest loginModel = new();
+    private string errorMessage = "";
+
+    private async Task HandleLogin()
+    {
+        try
+        {
+            var response = await Http.PostAsJsonAsync(baseUrl, loginModel);
+
+            if (response.IsSuccessStatusCode)
+            {
+                var user = await response.Content.ReadFromJsonAsync<User>();
+
+                if (user != null && user.Role != null)
+                {
+                    UserState.SetUser(user);
+                    if (user.Role?.RoleName == "Admin")
+                        NavigationManager.NavigateTo("/admin-dashboard");
+                    else
+                        NavigationManager.NavigateTo("/dashboard");
+                }
+                StateHasChanged();
+            }
+            else
+            {
+
+                var errorContent = await response.Content.ReadAsStringAsync();
+                errorMessage = errorContent;
+            }
+        }
+        catch (Exception ex)
+        {
+            errorMessage = "Error: " + ex.Message;
+        }
+    }
+}

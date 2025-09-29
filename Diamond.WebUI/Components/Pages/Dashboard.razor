@@ -1,0 +1,30 @@
+﻿@page "/dashboard"
+@using Diamond.WebUI.Services
+@rendermode InteractiveServer
+
+@inject UserState UserState
+@inject NavigationManager NavigationManager
+<h3>User Dashboard</h3>
+
+@if(!UserState.IsLoaded)
+{
+    <p>Loading...</p>
+}
+else if (UserState.CurrentUser == null)
+{
+    @*Not logged in *@
+    <p>You need to <a href="/login">login</a> to view this page.</p>
+}
+else
+{
+    <p>Welcome, @UserState.CurrentUser.FullName (@UserState.CurrentUser.Role?.RoleName)</p>
+
+    <!--example content-->
+
+    <div class="card p-3">
+        <h5>Your Profile</h5>
+        <p><strong>Username:</strong> @UserState.CurrentUser.UserName</p>
+        <p><strong>Full name:</strong> @UserState.CurrentUser.FullName</p>
+        <p><strong>Role:</strong> @UserState.CurrentUser.Role?.RoleName</p>
+    </div>
+}

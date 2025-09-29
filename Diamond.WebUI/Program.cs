@@ -1,4 +1,6 @@
 ﻿using Diamond.WebUI.Components;
+using Diamond.WebUI.Services;
+using Microsoft.AspNetCore.Components.Authorization;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -7,6 +9,9 @@ builder.Services.AddRazorComponents()
        .AddInteractiveServerComponents();
 
 builder.Services.AddHttpClient();
+
+
+builder.Services.AddScoped<UserState>();
 
 var app = builder.Build();
 

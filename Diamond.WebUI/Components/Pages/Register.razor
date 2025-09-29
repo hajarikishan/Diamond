@@ -1,0 +1,70 @@
+﻿@page "/register"
+
+@rendermode InteractiveServer
+
+@inject UserState UserState
+@inject HttpClient Http
+@inject NavigationManager NavigationManager
+@using Diamond.Share.Models
+@using System.Net.Http.Json
+@using Diamond.WebUI.Services
+
+<h3>Register</h3>
+
+<EditForm Model="registerModel" OnValidSubmit="HandleRegister" FormName="RegisterForm">
+    <InputText @bind-Value="registerModel.UserName" placeholder="Username" class="form-control" />
+    <InputText @bind-Value="registerModel.Password" type="password" placeholder="Password" class="form-control mt-2" />
+    <InputText @bind-Value="registerModel.FullName" placeholder="Full Name" class="form-control mt-2" />
+    <InputSelect @bind-Value="registerModel.RoleId" class="form-select mt-2">
+        <option value="">Select Role</option>
+        <option value="1">Admin</option>
+        <option value="2">Supervisor</option>
+        <option value="3">Worker</option>
+        <option value="4">Client</option>
+    </InputSelect>
+    <button type="submit" class="btn btn-primary mt-3">Register</button>
+</EditForm>
+
+@if (!string.IsNullOrEmpty(successMessage))
+{
+    <div class="alert alert-success mt-2">@successMessage</div>
+}
+
+@if (!string.IsNullOrEmpty(errorMessage))
+{
+    <div class="alert alert-danger mt-2">@errorMessage</div>
+}
+
+@code {
+    private string baseUrl = "http://localhost:5218/api/user/register";
+    private UserRegisterRequest registerModel = new();
+    private string successMessage = "";
+    private string errorMessage = "";
+
+    private async Task HandleRegister()
+    {
+        try
+        {
+            var response = await Http.PostAsJsonAsync(baseUrl, registerModel);
+
+            if (response.IsSuccessStatusCode)
+            {
+                successMessage = "User registered successfully!";
+                NavigationManager.NavigateTo("/login");
+                errorMessage = "";
+                registerModel = new UserRegisterRequest(); // clear form
+            }
+            else
+            {
+                var errorContent = await response.Content.ReadAsStringAsync();
+                errorMessage = errorContent;
+                successMessage = "";
+            }
+        }
+        catch (Exception ex)
+        {
+            errorMessage = "Error: " + ex.Message;
+            successMessage = "";
+        }
+    }
+}

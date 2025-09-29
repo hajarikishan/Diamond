@@ -1,0 +1,76 @@
+﻿@page "/admin-dashboard"
+@inject UserState UserState
+@inject NavigationManager NavigationManager
+@inject HttpClient Http
+@using System.Net.Http.Json
+@using Diamond.Share.Models
+@using Diamond.WebUI.Services
+
+<h3>Admin Dashboard</h3>
+
+@if (!authorized)
+{
+    <p>Checking access...</p>
+}
+else
+{
+    <div class="row">
+        <div class="col-md-4">
+            <div class="card p-3">
+                <h5>Total users by Role</h5>
+                @if (counts == null)
+                {
+                    <p>Loading...</p>
+                }
+                else
+                {
+                    <ul class="list-unstyled">
+                        @foreach (var c in counts)
+                        {
+                            <li>@c.RoleName : @c.Count</li>
+                        }
+                    </ul>
+                }
+            </div>
+        </div>
+        <div class="col-md-8">
+            <p>Welcome, @UserState.CurrentUser?.FullName</p>
+            <!-- more admin UI here -->
+        </div>
+    </div>
+}
+
+@code {
+    private string baseUrl = "http://localhost:5218/api/admin/stats";
+    private bool authorized = false;
+    private List<RoleCount>? counts;
+
+    protected override async Task OnInitializedAsync()
+    {
+        if (!UserState.IsLoaded) await UserState.LoadUserAsync();
+
+        if (UserState.CurrentUser == null)
+        {
+            NavigationManager.NavigateTo("/login");
+            return;
+        }
+
+        if (UserState.CurrentUser.Role?.RoleName != "Admin")
+        {
+            NavigationManager.NavigateTo("/access-denied");
+            return;
+        }
+
+        authorized = true;
+
+        // load admin stats
+        try
+        {
+            counts = await Http.GetFromJsonAsync<List<RoleCount>>(baseUrl);
+        }
+        catch
+        {
+            counts = new List<RoleCount>();
+        }
+    }
+}
